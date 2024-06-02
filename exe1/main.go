@@ -1,12 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-    msg_var := sayHello("Alice")
-    fmt.Println(msg_var)
-}
+	fmt.Println("Hello, World!")
+	// Unused variable
+	var unusedVar string
 
-func sayHello(name string) string {
-    return fmt.Sprintf("Hi %s", name)
+	// Ineffectual assignment
+	x := 42
+	x = 43
+
+	// Redundant import
+	_ = fmt.Sprintf("This import is redundant")
+
+	// Unnecessary conversion
+	y := int64(123)
+	fmt.Println(int64(y))
 }

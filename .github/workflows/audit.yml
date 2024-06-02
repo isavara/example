@@ -35,7 +35,7 @@ jobs:
     - name: Install staticcheck
       run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-    - name: Run staticcheck in all directories with go.mod
+    - name: RUN staticcheck in all directories with go.mod
       run: |
           echo "Current directory: $(pwd)"
           echo "Directory contents:"

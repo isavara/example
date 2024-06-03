@@ -9,7 +9,7 @@ on:
 jobs:
 
   audit:
-    runs-on: rome-runner-2
+    runs-on: rome-runner-4-label-4
     steps:
     - uses: actions/checkout@v2
 

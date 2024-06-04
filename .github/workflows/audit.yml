@@ -17,7 +17,7 @@ jobs:
           run: echo $PATH
 
         - name: checkout the code
-          uses: actions/checkout@v4
+          uses: actions/checkout@v3
 
         - name: Set up Go
           uses: actions/setup-go@v3

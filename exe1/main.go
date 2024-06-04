@@ -12,6 +12,7 @@ func main() {
 	// Ineffectual assignment
 	x := 42
 	x = 43
+	y = 90
 
 	// Redundant import
 	_ = fmt.Sprintf("This import is redundant")

@@ -7,27 +7,37 @@ on:
     branches: [main]
 
 jobs:
-  audit:
-    runs-on: rome-runner-4-label-4
-    steps:
-      - name: Print current working directory
-        run: pwd
 
-      - name: Capture PR Information
-        id: pr-info
-        run: |
-          pr_number="${{ github.event.number }}"
-          pr_url="${{ github.event.pull_request.html_url }}"
-          pr_branch="${{ github.event.pull_request.head.ref }}"
-          repo_url="${{ github.event.repository.html_url }}"
-          echo "PR Number: $pr_number"
-          echo "PR URL: $pr_url"
-          echo "PR Branch: $pr_branch"
-          echo "Repository URL: $repo_url"
-          echo "pr_number=$pr_number" >> $GITHUB_ENV
-          echo "pr_url=$pr_url" >> $GITHUB_ENV
-          echo "pr_branch=$pr_branch" >> $GITHUB_ENV
-          echo "repo_url=$repo_url" >> $GITHUB_ENV
+      build:
+        name: docker build and push
+        runs-on: rome-runner-4-label-4
+        
+        steps:    
+          - name: checkout the code
+            uses: actions/checkout@v4
+
+# jobs:
+#   audit:
+#     runs-on: rome-runner-4-label-4
+#     steps:
+#       - name: Print current working directory
+#         run: pwd
+
+#       - name: Capture PR Information
+#         id: pr-info
+#         run: |
+#           pr_number="${{ github.event.number }}"
+#           pr_url="${{ github.event.pull_request.html_url }}"
+#           pr_branch="${{ github.event.pull_request.head.ref }}"
+#           repo_url="${{ github.event.repository.html_url }}"
+#           echo "PR Number: $pr_number"
+#           echo "PR URL: $pr_url"
+#           echo "PR Branch: $pr_branch"
+#           echo "Repository URL: $repo_url"
+#           echo "pr_number=$pr_number" >> $GITHUB_ENV
+#           echo "pr_url=$pr_url" >> $GITHUB_ENV
+#           echo "pr_branch=$pr_branch" >> $GITHUB_ENV
+#           echo "repo_url=$repo_url" >> $GITHUB_ENV
  
 
     # - name: Set up Go

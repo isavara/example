@@ -9,10 +9,13 @@ on:
 jobs:
 
       build:
-        name: docker build and push with new git version
+        name: Build with new git version
         runs-on: rome-runner-4-label-4
         
-        steps:    
+        steps:
+          - name: Print PATH
+            run: echo $PATH
+
           - name: checkout the code
             uses: actions/checkout@v3
             with:

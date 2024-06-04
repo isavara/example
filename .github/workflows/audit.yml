@@ -13,13 +13,20 @@ jobs:
         runs-on: rome-runner-4-label-4
         
         steps:
-          - name: Print PATH
-            run: echo $PATH
 
-          - name: checkout the code
-            uses: actions/checkout@v2
-            with:
-              fetch-depth: 0
+        - name: Set PATH
+          run: |
+            echo "## Current PATH: $PATH"
+            export PATH="/opt/rh/rh-git227/root/usr/bin:$PATH"
+            echo "## Updated PATH: $PATH"
+
+        - name: Print PATH
+          run: echo $PATH
+
+        - name: checkout the code
+          uses: actions/checkout@v2
+          with:
+             fetch-depth: 0
 
 # jobs:
 #   audit:

@@ -9,7 +9,7 @@ on:
 jobs:
 
       build:
-        name: docker build and push
+        name: docker build and push with new git version
         runs-on: rome-runner-4-label-4
         
         steps:    

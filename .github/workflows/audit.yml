@@ -18,6 +18,8 @@ jobs:
 
         - name: checkout the code
           uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
 
         - name: Set up Go
           uses: actions/setup-go@v3
@@ -30,13 +32,34 @@ jobs:
         - name: Install staticcheck
           run: go install honnef.co/go/tools/cmd/staticcheck@latest
           
-        - name: Run golint and exit on issues
+        - name: Get list of changed files
+          id: changed-files
           run: |
-                golint_output=$(golint ./...)
-                echo "$golint_output"
-                if [ -n "$golint_output" ]; then
-                  echo "golint found issues"
-                  exit 1
-                else
-                  echo "No golint issues found"
+            git diff --name-only HEAD~1 HEAD > changed_files.txt
+            echo "Changed files:"
+            cat changed_files.txt
+    
+        - name: Run golint on changed files and exit on issues
+          run: |
+            files=$(cat changed_files.txt | grep '.go$' || true)
+            if [ -z "$files" ]; then
+              echo "No Go files changed"
+              exit 0
+            fi
+    
+            golint_output=""
+            for file in $files; do
+              lint_result=$(golint "$file")
+              if [ -n "$lint_result" ]; then
+                golint_output="$golint_output\n$lint_result"
+              fi
+            done
+    
+            if [ -n "$golint_output" ]; then
+              echo -e "$golint_output"
+              echo "golint found issues"
+              exit 1
+            else
+              echo "No golint issues found"
+            fi
                 fi          

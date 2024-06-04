@@ -9,7 +9,7 @@ on:
 jobs:
 
       build:
-        name: Build with new git version
+        name: Build with new git
         runs-on: rome-runner-4-label-4
         
         steps:

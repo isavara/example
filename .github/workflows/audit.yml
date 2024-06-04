@@ -15,10 +15,8 @@ jobs:
         steps:
 
         - name: Set PATH
-          run: |
-            echo "## Current PATH: $PATH"
-            export PATH="/opt/rh/rh-git227/root/usr/bin:$PATH"
-            echo "## Updated PATH: $PATH"
+          run: ./set_path.sh
+        
 
         - name: Print PATH
           run: echo $PATH

@@ -10,7 +10,7 @@ jobs:
 
       build:
         name: Build with new git
-        runs-on: rome-runner-label-1
+        runs-on: rome-runner-1-label-1
         
         steps:
         - name: Print PATH

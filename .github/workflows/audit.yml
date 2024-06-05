@@ -62,4 +62,3 @@ jobs:
             else
               echo "No golint issues found"
             fi
-                fi          

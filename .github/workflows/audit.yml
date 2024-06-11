@@ -9,7 +9,7 @@ on:
 jobs:
 
       build:
-        name: Build with new git
+        name: Perfor golit and go-static check
         runs-on: rome-runner-1-label-1
         
         steps:

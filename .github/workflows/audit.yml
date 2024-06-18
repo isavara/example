@@ -23,30 +23,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19.13
-
-    # - name: Install golint
-    #   run: |
-    #     go install golang.org/x/lint/golint@latest
-    #     echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
-    # - name: Install staticcheck
-    #   run: |
-    #     go install honnef.co/go/tools/cmd/staticcheck@latest
-    #     echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
-     # Verify golint installation by running it on a dummy file
-    - name: Verify golint installation
-      run: |
-         printf "package main\nfunc main(){}" > dummy.go
-         golint dummy.go
-
-   # Verify staticcheck installation by running it on a dummy file
-    - name: Verify staticcheck installation
-      run: |
-         printf "package main\nfunc main(){}" > dummy.go
-         staticcheck dummy.go
-       
+        go-version: 1.19.13     
        
     - name: Get list of changed files
       id: changed-files

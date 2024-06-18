@@ -35,18 +35,19 @@ jobs:
     #     go install honnef.co/go/tools/cmd/staticcheck@latest
     #     echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    # Verify golint installation by running it on a dummy file
+     # Verify golint installation by running it on a dummy file
     - name: Verify golint installation
       run: |
-        echo "package main\nfunc main(){}" > dummy.go
-        golint dummy.go
+         printf "package main\nfunc main(){}" > dummy.go
+         golint dummy.go
 
-    # Verify staticcheck installation by running it on a dummy file
+   # Verify staticcheck installation by running it on a dummy file
     - name: Verify staticcheck installation
       run: |
-        echo "package main\nfunc main(){}" > dummy.go
-        staticcheck dummy.go
-        
+         printf "package main\nfunc main(){}" > dummy.go
+         staticcheck dummy.go
+       
+       
     - name: Get list of changed files
       id: changed-files
       run: |

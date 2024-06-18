@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Perform golint and go-staticcheck
-    runs-on: rome-runner-1-label-1
+    runs-on: rome-runner-2-label-2
 
     steps:
     - name: Print PATH
@@ -25,15 +25,21 @@ jobs:
       with:
         go-version: 1.19.13
 
-    - name: Install golint
-      run: |
-        go install golang.org/x/lint/golint@latest
-        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+    # - name: Install golint
+    #   run: |
+    #     go install golang.org/x/lint/golint@latest
+    #     echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - name: Install staticcheck
-      run: |
-        go install honnef.co/go/tools/cmd/staticcheck@latest
-        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+    # - name: Install staticcheck
+    #   run: |
+    #     go install honnef.co/go/tools/cmd/staticcheck@latest
+    #     echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: print golint version
+      run: golint --version 
+
+    - name: print staticcheck version
+      run: staticcheck --version
 
     - name: Get list of changed files
       id: changed-files

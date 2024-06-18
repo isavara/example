@@ -7,74 +7,77 @@ on:
     branches: [main]
 
 jobs:
-
-      build:
-        name: Perform golint and go-static check
-        runs-on: rome-runner-1-label-1
+  build:
+    name: Perform golint and go-staticcheck
+    runs-on: rome-runner-1-label-1
         
-        steps:
-        - name: Print PATH
-          run: echo $PATH
+    steps:
+    - name: Print PATH
+      run: echo $PATH
 
-        - name: checkout the code
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: 0
+    - name: checkout the code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-        - name: Set up Go
-          uses: actions/setup-go@v3
-          with:
-            go-version: 1.19.13 
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19.13
 
-        - name: Install golint
-          run: go install golang.org/x/lint/golint@latest
-  
-        - name: Install staticcheck
-          run: go install honnef.co/go/tools/cmd/staticcheck@latest
-          
-        - name: Get list of changed files
-          id: changed-files
-          run: |
-            git diff --name-only HEAD~1 HEAD > changed_files.txt
-            echo "Changed files:"
-            cat changed_files.txt
+    - name: Install golint
+      run: |
+        go install golang.org/x/lint/golint@latest
+        echo "::add-path::$(go env GOPATH)/bin"
+
+    - name: Install staticcheck
+      run: |
+        go install honnef.co/go/tools/cmd/staticcheck@latest
+        echo "::add-path::$(go env GOPATH)/bin"
+
+    - name: Get list of changed files
+      id: changed-files
+      run: |
+        git diff --name-only HEAD~1 HEAD > changed_files.txt
+        echo "Changed files:"
+        cat changed_files.txt
     
-        - name: Run golint on changed files and exit on issues
-          run: |
-            files=$(cat changed_files.txt | grep '.go$' || true)
-            if [ -z "$files" ]; then
-              echo "No Go files changed"
-              exit 0
-            fi
+    - name: Run golint on changed files and exit on issues
+      run: |
+        files=$(cat changed_files.txt | grep '.go$' || true)
+        if [ -z "$files" ]; then
+          echo "No Go files changed"
+          exit 0
+        fi
     
-            golint_output=""
-            for file in $files; do
-              lint_result=$(golint "$file")
-              if [ -n "$lint_result" ]; then
-                golint_output="$golint_output\n$lint_result"
-              fi
-            done
+        golint_output=""
+        for file in $files; do
+          lint_result=$(golint "$file")
+          if [ -n "$lint_result" ]; then
+            golint_output="$golint_output\n$lint_result"
+          fi
+        done
     
-            if [ -n "$golint_output" ]; then
-              echo -e "$golint_output"
-              echo "golint found issues"
-              exit 1
-            else
-              echo "No golint issues found"
-            fi
+        if [ -n "$golint_output" ]; then
+          echo -e "$golint_output"
+          echo "golint found issues"
+          exit 1
+        else
+          echo "No golint issues found"
+        fi
 
-        - name: RUN staticCHECK in all directories with go.mod
-          run: |
-              echo "Current directory: $(pwd)"
-              echo "Directory contents:"
-              ls -la
-              for dir in */ ; do
-                if [ -f "$dir/go.mod" ]; then
-                  echo "Found go.mod in $dir"
-                  cd "$dir"
-                  staticcheck ./...
-                  cd -
-                else
-                  echo "No go.mod found in $dir, skipping"
-                fi
-              done
+    - name: Run staticCHECK in all directories with go.mod
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        for dir in */ ; do
+          if [ -f "$dir/go.mod" ]; then
+            echo "Found go.mod in $dir"
+            cd "$dir"
+            staticcheck ./...
+            cd -
+          else
+            echo "No go.mod found in $dir, skipping"
+          fi
+        done

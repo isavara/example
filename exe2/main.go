@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// var unusedVar string
+var unusedVar string
 
 func main() {
 	msgvar22 := sayHello("Alice")

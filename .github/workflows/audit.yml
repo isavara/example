@@ -56,18 +56,30 @@ jobs:
           echo "No golint issues found"
         fi
 
-    - name: Run staticCHECK in all directories with go.mod
+    - name: Run staticcheck in all directories with go.mod
       run: |
         echo "Current directory: $(pwd)"
         echo "Directory contents:"
         ls -la
+        staticcheck_output=""
         for dir in */ ; do
           if [ -f "$dir/go.mod" ]; then
             echo "Found go.mod in $dir"
             cd "$dir"
-            staticcheck ./...
+            result=$(staticcheck ./... 2>&1)
+            if [ -n "$result" ]; then
+              staticcheck_output="$staticcheck_output\n$result"
+            fi
             cd -
           else
             echo "No go.mod found in $dir, skipping"
           fi
         done
+
+        if [ -n "$staticcheck_output" ]; then
+          echo -e "$staticcheck_output"
+          echo "staticcheck found issues"
+          exit 1
+        else
+          echo "No staticcheck issues found"
+        fi

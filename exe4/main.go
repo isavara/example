@@ -5,8 +5,9 @@ import "fmt"
 // var unusedVar string
 
 func main() {
-	msgvar := sayHello("Alice")
-	fmt.Println(msgvar)
+
+	msgvar_22 := sayHello("Alice")
+	fmt.Println(msgvar_22)
 }
 
 func sayHello(name string) string {

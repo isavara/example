@@ -68,7 +68,7 @@ jobs:
             cd "$dir"
             result=$(staticcheck ./... 2>&1 || true)
             if [ -n "$result" ]; then
-              staticcheck_output="$staticcheck_output\n$result"
+              staticcheck_output="$staticcheck_output\nFound go.mod in $dir\n$result"
             fi
             cd -
           else

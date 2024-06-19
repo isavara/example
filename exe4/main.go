@@ -6,8 +6,8 @@ import "fmt"
 
 func main() {
 
-	msgvar_22 := sayHello("Alice")
-	fmt.Println(msgvar_22)
+	msgvar := sayHello("Alice")
+	fmt.Println(msgvar)
 }
 
 func sayHello(name string) string {

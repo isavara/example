@@ -51,7 +51,7 @@ jobs:
           echo "No golint issues found"
         fi
 
-    - name: Run staticcheck in all directories with go.mod
+    - name: Run staticcheck in all directories with go.mod, aggregate the errors and report them at the end.
       run: |
         echo "Current directory: $(pwd)"
         echo "Directory contents:"

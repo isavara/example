@@ -1,0 +1,8 @@
+name: Call echo
+
+on:
+    pull:
+
+      jobs:
+          call-echo-workflow:
+                uses: isavara/shared-workflows/.github/workflows/echo.yaml@main

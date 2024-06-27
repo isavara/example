@@ -1,7 +1,7 @@
 name: Call echo
 
 on:
-    pull:
+    push:
 
       jobs:
           call-echo-workflow:

@@ -12,6 +12,11 @@ jobs:
     runs-on: rome-runner-2-label-2
 
     steps:
+
+    - name: Use custom workspace
+      run: |
+        cd /home/itadmin/runner-2/actions-runner/build
+        
     - name: Print PATH
       run: echo $PATH
 

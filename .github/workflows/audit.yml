@@ -32,6 +32,7 @@ jobs:
         echo "Changed files:"
         cat changed_files.txt
 
+<<<<<<< branch-siva-example
     - name: Run golint on changed files and exit on issues
       run: |
         files=$(cat changed_files.txt | grep '.go$' || true)
@@ -39,6 +40,10 @@ jobs:
           echo "No Go files changed"
           exit 0
         fi
+=======
+        - name: checkout the code
+          uses: actions/checkout@v3
+>>>>>>> main
 
         golint_output=""
         for file in $files; do
@@ -70,6 +75,7 @@ jobs:
             if [ -n "$result" ]; then
               staticcheck_output="$staticcheck_output\nFound go.mod in $dir\n$result"
             fi
+<<<<<<< branch-siva-example
             cd -
           else
             echo "No go.mod found in $dir, skipping"
@@ -83,3 +89,21 @@ jobs:
         else
           echo "No staticcheck issues found"
         fi
+=======
+    
+            golint_output=""
+            for file in $files; do
+              lint_result=$(golint "$file")
+              if [ -n "$lint_result" ]; then
+                golint_output="$golint_output\n$lint_result"
+              fi
+            done
+    
+            if [ -n "$golint_output" ]; then
+              echo -e "$golint_output"
+              echo "golint found issues"
+              exit 1
+            else
+              echo "No golint issues found"
+            fi
+>>>>>>> main

@@ -2,9 +2,11 @@ name: Audit
 
 on:
   push:
-    branches: [main]
+    branches: [ "*" ]
   pull_request:
-    branches: [main]
+    branches-ignore:
+      - main
+      - 'v*.*'
 
 jobs:
   build:

@@ -12,7 +12,6 @@ jobs:
   build:
     name: Perform golint and go-staticcheck
     runs-on: new-rome-runner-3-label-3
-
     steps:
 
     - name: Use custom workspace
@@ -25,87 +24,5 @@ jobs:
     - name: checkout the code
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-      
-    - name: Get list of changed files
-      id: changed-files
-      run: |
-        git diff --name-only HEAD~1 HEAD > changed_files.txt
-        echo "Changed files:"
-        cat changed_files.txt
+        fetch-depth: 0   
 
-<<<<<<< branch-siva-example
-    - name: Run golint on changed files and exit on issues
-      run: |
-        files=$(cat changed_files.txt | grep '.go$' || true)
-        if [ -z "$files" ]; then
-          echo "No Go files changed"
-          exit 0
-        fi
-=======
-        - name: checkout the code
-          uses: actions/checkout@v3
->>>>>>> main
-
-        golint_output=""
-        for file in $files; do
-          lint_result=$(golint "$file")
-          if [ -n "$lint_result" ]; then
-            golint_output="$golint_output\n$lint_result"
-          fi
-        done
-
-        if [ -n "$golint_output" ]; then
-          echo -e "$golint_output"
-          echo "golint found issues"
-          exit 1
-        else
-          echo "No golint issues found"
-        fi
-
-    - name: Run staticcheck in all directories with go.mod, aggregate the errors and report them at the end.
-      run: |
-        echo "Current directory: $(pwd)"
-        echo "Directory contents:"
-        ls -la
-        staticcheck_output=""
-        for dir in */ ; do
-          if [ -f "$dir/go.mod" ]; then
-            echo "Found go.mod in $dir"
-            cd "$dir"
-            result=$(staticcheck ./... 2>&1 || true)
-            if [ -n "$result" ]; then
-              staticcheck_output="$staticcheck_output\nFound go.mod in $dir\n$result"
-            fi
-<<<<<<< branch-siva-example
-            cd -
-          else
-            echo "No go.mod found in $dir, skipping"
-          fi
-        done
-
-        if [ -n "$staticcheck_output" ]; then
-          echo -e "$staticcheck_output"
-          echo "staticcheck found issues"
-          exit 1
-        else
-          echo "No staticcheck issues found"
-        fi
-=======
-    
-            golint_output=""
-            for file in $files; do
-              lint_result=$(golint "$file")
-              if [ -n "$lint_result" ]; then
-                golint_output="$golint_output\n$lint_result"
-              fi
-            done
-    
-            if [ -n "$golint_output" ]; then
-              echo -e "$golint_output"
-              echo "golint found issues"
-              exit 1
-            else
-              echo "No golint issues found"
-            fi
->>>>>>> main

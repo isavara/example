@@ -2,12 +2,13 @@ name: Audit
 
 on:
   push:
-    branches: [ "*" ]
+    branches-ignore:
+      - main
   pull_request:
     branches-ignore:
       - main
       - 'v*.*'
-
+      
 jobs:
   build:
     name: Perform golint and go-staticcheck

@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Perform golint and go-staticcheck
-    runs-on: rome-runner-2-label-2
+    runs-on: new-rome-runner-3-label-3
 
     steps:
 

@@ -2,11 +2,11 @@ package main
 
 import "fmt"
 
-var unusedVar1 string
+var unusedVar2 string
 
 func main() {
-	msgvar22 := sayHello("Alice")
-	fmt.Println(msgvar22)
+	msgvar2 := sayHello("Alice")
+	fmt.Println(msgvar2)
 }
 
 func sayHello(name string) string {

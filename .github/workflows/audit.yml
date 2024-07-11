@@ -21,8 +21,4 @@ jobs:
     - name: Print PATH
       run: echo $PATH
 
-    - name: checkout the code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0   
 

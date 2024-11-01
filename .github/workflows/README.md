@@ -1,1 +1,1 @@
-This is README from .github directory main page
+This is README from .github directory inside workflow directory.

@@ -25,8 +25,8 @@ jobs:
     environment: dev
     needs: build
     if: |     
-      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' ||
-      github.event_name == 'pull_request' && github.pull_request.base.ref == 'main'      
+      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.head_commit.message != 'Merge pull request' ||
+      github.event_name == 'pull_request' && github.pull_request.base.ref == 'main' && github.pull_request.merged == true     
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job

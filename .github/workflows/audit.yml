@@ -6,12 +6,12 @@ on:
       - 'BFUEM-*'
       - main      
   pull_request:
-    branches-ignore:
+    branches:
       - main
+    branches-ignore:
       - 'v*.*'
-      
-jobs:
 
+jobs:
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1
@@ -20,22 +20,20 @@ jobs:
         run: echo "The job build is running...."       
       - name: Print PATH
         run: echo $PATH
-        
-        
+
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
     needs: build
-
-    #if: github.ref == 'refs/heads/master'  
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}    
+    # Run only if the workflow was triggered by a push to the 'main' branch
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} 
+    # Also run when the pull request is merged into main
+    # This ensures it runs when the PR targeting 'main' is merged
+    if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job
         run: echo "The job update-mcm-gke is running..."       
       - name: Print PATH
-        run: echo $PATH    
-
-
+        run: echo $PATH

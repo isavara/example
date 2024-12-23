@@ -17,7 +17,7 @@ jobs:
     runs-on: gcp-public-runner-label-1
     steps:
       - name: Print Step#1
-        run: echo "The job build is running..."       
+        run: echo "The job build is running...."       
       - name: Print PATH
         run: echo $PATH
         

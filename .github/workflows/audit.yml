@@ -19,8 +19,12 @@ jobs:
       - id: check
         shell: bash
         run: |
+          # Define variables
+          EVENT_NAME="${{ github.event_name }}"
+          HEAD_REF="${{ github.head_ref }}"
+
           # Block pull requests targeting branches matching 'v*.*'
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.head_ref }}" == v*.* ]]; then
+          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT

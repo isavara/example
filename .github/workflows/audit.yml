@@ -28,7 +28,9 @@ jobs:
     environment: dev
     needs: build
 
-    #if: github.ref == 'refs/heads/master'    
+    #if: github.ref == 'refs/heads/master'  
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}    
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job

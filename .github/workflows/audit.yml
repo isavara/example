@@ -14,12 +14,9 @@ jobs:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1
     steps:
-
-    - name: Use custom workspace
-      run: |
-        cd /home/itadmin/runner-2/actions-runner/build
-        
-    - name: Print PATH
-      run: echo $PATH
+      - name: Print PATH
+        run: echo $PATH          
+      - name: Print PATH
+        run: echo $PATH
 
 

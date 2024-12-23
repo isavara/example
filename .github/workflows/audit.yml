@@ -3,16 +3,43 @@ name: Audit
 on:
   push:
     branches:
-      - 'BFUEM-*'    # Trigger for feature branches
-      - main         # Trigger for main branch
+      - 'BFUEM-*'
+      - main
   pull_request:
     branches:
-      - main         # Trigger only when PR is targeting 'main' branch
+      - main
 
 jobs:
+  validate-workflow-conditions:
+    name: Validate Workflow Conditions
+    runs-on: gcp-public-runner-label-1
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+    steps:
+      - id: check
+        shell: bash
+        run: |
+          # Define variables
+          EVENT_NAME="${{ github.event_name }}"
+          HEAD_REF="${{ github.head_ref }}"
+
+          # Block pull requests targeting branches matching 'v*.*'
+          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* ]]; then
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          else
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          fi
+
+      # Print the result of the proceed variable for debugging
+      - name: Print Proceed Value
+        run: |
+          echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
+
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1
+    needs: validate-workflow-conditions
+    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
     steps:
       - name: Print Step#1
         run: echo "The job build is running...."
@@ -23,11 +50,8 @@ jobs:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
-    needs: build
-    if: |     
-      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' ||
-      github.event_name == 'pull_request' && github.pull_request.base.ref == 'main'     
-
+    needs: [validate-workflow-conditions, build]
+    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' || github.event_name == 'pull_request' && github.pull_request.base.ref == 'main') }}
     steps:
       - name: Print Step#1 in deploy-mcm-gke job
         run: echo "The job update-mcm-gke is running..."

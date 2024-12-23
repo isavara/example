@@ -19,12 +19,12 @@ jobs:
       - id: check
         shell: bash
         run: |
-          # Define variables
+            # Define variables based on GitHub context
           EVENT_NAME="${{ github.event_name }}"
-          HEAD_REF="${{ github.head_ref }}"
-          BASE_REF="${{ github.base_ref }}"
-          PR_MERGED="${{ github.event.pull_request.merged }}"
-          
+          HEAD_REF="${{ github.head_ref }}" # For pull requests
+          BASE_REF="${{ github.base_ref }}" # For pull requests
+          PR_MERGED="${{ github.event.pull_request.merged }}" # For pull requests
+
           # Log the variables
           echo "EVENT_NAME: $EVENT_NAME"
           echo "HEAD_REF: $HEAD_REF"

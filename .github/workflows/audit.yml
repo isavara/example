@@ -10,13 +10,27 @@ on:
       - 'v*.*'
       
 jobs:
+
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1
     steps:
-      - name: Print PATH
-        run: echo $PATH          
+      - name: Print Step#1
+        run: echo "The job build is running..."       
       - name: Print PATH
         run: echo $PATH
+        
+        
+  update-mcm-gke:
+    name: Update MCM on GKE
+    runs-on: gcp-public-runner-label-1
+    environment: dev
+    needs: build 
+
+    steps:
+      - name: Print Step#1 in deploy-mcm-gke job
+        run: echo "The job update-mcm-gke is running..."       
+      - name: Print PATH
+        run: echo $PATH    
 
 

@@ -42,7 +42,7 @@ jobs:
     if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
     steps:
       - name: Print Step#1
-        run: echo "The job build is running...."
+        run: echo "The job build is running........"
       - name: Print PATH
         run: echo $PATH
 

@@ -8,6 +8,8 @@ on:
   pull_request:
     branches:
       - main         # Trigger only when PR is targeting 'main' branch
+    branches-ignore:
+      - 'v*.*'  
 
 jobs:
   build:

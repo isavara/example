@@ -29,7 +29,9 @@ jobs:
           else
             echo "proceed=true" >> $GITHUB_OUTPUT
           fi  
-
+      - name: Print Proceed Value
+        run: echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
+        
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1

@@ -3,13 +3,11 @@ name: Audit
 on:
   push:
     branches:
-      - 'BFUEM-*'
-      - main      
+      - 'BFUEM-*'    # Trigger for feature branches
+      - main         # Trigger for main branch
   pull_request:
     branches:
-      - main
-    branches-ignore:
-      - 'v*.*'
+      - main         # Trigger only when PR is targeting 'main' branch
 
 jobs:
   build:
@@ -17,7 +15,7 @@ jobs:
     runs-on: gcp-public-runner-label-1
     steps:
       - name: Print Step#1
-        run: echo "The job build is running...."       
+        run: echo "The job build is running...."
       - name: Print PATH
         run: echo $PATH
 
@@ -26,14 +24,13 @@ jobs:
     runs-on: gcp-public-runner-label-1
     environment: dev
     needs: build
-    # Run only if the workflow was triggered by a push to the 'main' branch
+    # Only run on push to the main branch or when a PR is merged into main
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} 
-    # Also run when the pull request is merged into main
-    # This ensures it runs when the PR targeting 'main' is merged
+    # Or when the PR targeting 'main' is merged
     if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job
-        run: echo "The job update-mcm-gke is running..."       
+        run: echo "The job update-mcm-gke is running..."
       - name: Print PATH
         run: echo $PATH

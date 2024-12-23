@@ -10,16 +10,29 @@ on:
       - 'v*.*'
       
 jobs:
+
   build:
     name: Perform golint and go-staticcheck
-    runs-on: new-rome-runner-3-label-3
+    runs-on: gcp-public-runner-label-1
     steps:
-
-    - name: Use custom workspace
-      run: |
-        cd /home/itadmin/runner-2/actions-runner/build
+      - name: Print Step#1
+        run: echo "The job build is running..."       
+      - name: Print PATH
+        run: echo $PATH
         
-    - name: Print PATH
-      run: echo $PATH
+        
+  update-mcm-gke:
+    name: Update MCM on GKE
+    runs-on: gcp-public-runner-label-1
+    environment: dev
+    needs: build
+
+    if: github.ref == 'refs/heads/master'    
+
+    steps:
+      - name: Print Step#1 in deploy-mcm-gke job
+        run: echo "The job update-mcm-gke is running..."       
+      - name: Print PATH
+        run: echo $PATH    
 
 

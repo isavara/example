@@ -24,9 +24,18 @@ jobs:
           HEAD_REF="${{ github.head_ref }}"
           BASE_REF="${{ github.base_ref }}"
           PR_MERGED="${{ github.event.pull_request.merged }}"
+          
+          # Log the variables
+          echo "EVENT_NAME: $EVENT_NAME"
+          echo "HEAD_REF: $HEAD_REF"
+          echo "BASE_REF: $BASE_REF"
+          echo "PR_MERGED: $PR_MERGED"
 
           # Block pull requests targeting branches matching 'v*.*' (before merge)
           if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* && "$PR_MERGED" == "false" ]]; then
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          # For merges, check if the commit message contains version (v*.*)
+          elif [[ "$EVENT_NAME" == "push" && "$HEAD_REF" == "" && "$BASE_REF" == "main" && "$GITHUB_SHA" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT

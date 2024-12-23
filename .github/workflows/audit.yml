@@ -29,7 +29,6 @@ jobs:
           else
             echo "proceed=true" >> $GITHUB_OUTPUT
           fi  
-        shell: /usr/bin/bash -e {0}
 
   build:
     name: Perform golint and go-staticcheck

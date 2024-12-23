@@ -19,7 +19,7 @@ jobs:
       - id: check
         shell: bash
         run: |
-            # Define variables based on GitHub context
+          # Define variables based on GitHub context
           EVENT_NAME="${{ github.event_name }}"
           HEAD_REF="${{ github.head_ref }}" # For pull requests
           BASE_REF="${{ github.base_ref }}" # For pull requests

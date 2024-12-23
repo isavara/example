@@ -3,37 +3,33 @@ name: Audit
 on:
   push:
     branches:
-      - 'BFUEM-*'
-      - main      
+      - 'BFUEM-*'    # Trigger for feature branches
+      - main         # Trigger for main branch
   pull_request:
-    branches-ignore:
-      - main
-      - 'v*.*'
-      
-jobs:
+    branches:
+      - main         # Trigger only when PR is targeting 'main' branch
 
+jobs:
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1
     steps:
       - name: Print Step#1
-        run: echo "The job build is running..."       
+        run: echo "The job build is running...."
       - name: Print PATH
         run: echo $PATH
-        
-        
+
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
     needs: build
-
-    if: github.ref == 'refs/heads/master'    
+    if: |
+      github.event_name == 'push' && github.ref == 'refs/heads/main' ||
+      github.event_name == 'pull_request' && github.pull_request.base.ref == 'main'
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job
-        run: echo "The job update-mcm-gke is running..."       
+        run: echo "The job update-mcm-gke is running..."
       - name: Print PATH
-        run: echo $PATH    
-
-
+        run: echo $PATH

@@ -3,7 +3,8 @@ name: Audit
 on:
   push:
     branches:
-      - 'BFUEM-*' 
+      - 'BFUEM-*'
+      - main      
   pull_request:
     branches-ignore:
       - main

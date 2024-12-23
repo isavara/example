@@ -22,9 +22,11 @@ jobs:
           # Define variables
           EVENT_NAME="${{ github.event_name }}"
           HEAD_REF="${{ github.head_ref }}"
+          BASE_REF="${{ github.base_ref }}"
+          PR_MERGED="${{ github.event.pull_request.merged }}"
 
-          # Block pull requests targeting branches matching 'v*.*'
-          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* ]]; then
+          # Block pull requests targeting branches matching 'v*.*' (before merge)
+          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* && "$PR_MERGED" == "false" ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT

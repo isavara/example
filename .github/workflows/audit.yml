@@ -17,9 +17,10 @@ jobs:
       proceed: ${{ steps.check.outputs.proceed }}
     steps:
       - id: check
+        shell: bash
         run: |
           # Block pull requests targeting branches matching 'v*.*'
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.head_ref }}" == v* ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.head_ref }}" == v*.* ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT

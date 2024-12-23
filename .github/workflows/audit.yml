@@ -28,10 +28,12 @@ jobs:
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT
-          fi  
+          fi
+
+      # Print the result of the proceed variable for debugging
       - name: Print Proceed Value
         run: echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
-        
+
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1

@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Perform golint and go-staticcheck
-    runs-on: new-rome-runner-3-label-3
+    runs-on: gcp-public-runner-label-1
     steps:
 
     - name: Use custom workspace

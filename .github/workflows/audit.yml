@@ -24,10 +24,9 @@ jobs:
     runs-on: gcp-public-runner-label-1
     environment: dev
     needs: build
-    # Only run on push to the main branch or when a PR is merged into main
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} 
-    # Or when the PR targeting 'main' is merged
-    if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}
+    if: |
+      github.event_name == 'push' && github.ref == 'refs/heads/main' ||
+      github.event_name == 'pull_request' && github.pull_request.base.ref == 'main'
 
     steps:
       - name: Print Step#1 in deploy-mcm-gke job

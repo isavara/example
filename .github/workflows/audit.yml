@@ -34,7 +34,8 @@ jobs:
 
       # Print the result of the proceed variable for debugging
       - name: Print Proceed Value
-        run: echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
+        run: |
+          echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
 
   build:
     name: Perform golint and go-staticcheck

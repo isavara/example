@@ -63,7 +63,24 @@ jobs:
         run: echo "The job build is running......---.."
       - name: Print PATH
         run: echo $PATH
-
+        
+        
+  test:    
+    name: Job to run the tests
+    runs-on: bigfix-docker-rhel-runner-1-label-2
+    needs:
+      - validate-workflow-conditions
+      - build
+      # - fetch-changes
+    
+    steps:        
+      - name: Run branch and commit message checks
+        run: |
+          chmod +x .githooks/validate-branch-and-commit-msg
+          export GIT_COMMIT_MSG_FILE=$(mktemp)
+          echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
+          .githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
+          
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Function to validate if a string matches a specific pattern
+# Usage: validate_pattern <string> <pattern>
+validate_pattern() {
+    local string="$1"
+    local pattern="$2"
+    if [[ "$string" =~ $pattern ]]; then
+        return 0  # Pattern matched
+    else
+        return 1  # Pattern not matched
+    fi
+}
+
+# Initialize error variables
+ERRORS=""
+
+echo "Getting branch name..."
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+echo "Branch name: $BRANCH_NAME"
+
+# Validate branch name
+if ! validate_pattern "$BRANCH_NAME" "^[A-Za-z]+-[0-9]+(_[A-Za-z0-9]+){2,}$"; then
+    ERRORS+="Your branch $BRANCH_NAME is not following the naming convention. Please provide the branch name in the format <jira-id>_<user>_<purpose> eg., BFUEM-1234_john_firstcommit\n"
+fi
+echo "Branch name validation completed.."
+
+# Validate commit message
+COMMIT_MSG_FILE=$1
+
+if [[ -z "$COMMIT_MSG_FILE" ]]; then
+    ERRORS+="Commit message file is not provided. Exiting.\n"
+else
+    if [[ ! -f "$COMMIT_MSG_FILE" ]]; then
+        ERRORS+="Commit message file '$COMMIT_MSG_FILE' does not exist. Exiting.\n"
+    else
+        echo "Validating commit message in file: $COMMIT_MSG_FILE"
+        COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+        echo "Commit message: $COMMIT_MSG"
+
+        # Validate commit message format
+
+        if ! validate_pattern "$COMMIT_MSG" "^[A-Za-z]+-[0-9]+:.+$"; then
+            ERRORS+="Your commit message '$COMMIT_MSG' is not following the naming convention. Please provide the commit message in the format <jira-id>:<message> eg., BFUEM-1234:fixedMemoryleak\n"
+        fi
+        echo "Commit message validation completed."
+    fi
+fi
+
+# Check if there are any errors
+if [[ -n "$ERRORS" ]]; then
+    echo -e "Validation errors found:\n$ERRORS"
+    exit 1
+else
+    echo "Branch name and commit message validated successfully."
+fi

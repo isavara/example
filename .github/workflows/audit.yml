@@ -67,7 +67,7 @@ jobs:
         
   test:    
     name: Job to run the tests
-    runs-on: bigfix-docker-rhel-runner-1-label-2
+    runs-on: gcp-public-runner-label-1
     needs:
       - validate-workflow-conditions
       - build

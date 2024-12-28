@@ -73,7 +73,16 @@ jobs:
       - build
       # - fetch-changes
     
-    steps:        
+    steps:
+      - name: Present working directory
+        run: pwd
+        
+      - name: Check out this repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: test
+          
       - name: Run branch and commit message checks
         run: |
           chmod +x .githooks/validate-branch-and-commit-msg

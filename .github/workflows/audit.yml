@@ -53,22 +53,65 @@ jobs:
         run: |
           echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
 
-  build:
-    name: Perform golint and go-staticcheck
+  # build:
+    # name: Perform golint and go-staticcheck
+    # runs-on: gcp-public-runner-label-1
+    # needs: validate-workflow-conditions
+    # if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
+    # steps:
+      # - name: Print Step#1
+        # run: echo "The job build is running......---.."
+      # - name: Print PATH
+        # run: echo $PATH
+        
+        
+  test:    
+    name: Job to run the tests
     runs-on: gcp-public-runner-label-1
-    needs: validate-workflow-conditions
-    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
+    needs:
+      - validate-workflow-conditions
+      # - build
+      # - fetch-changes
+    defaults:
+      run:
+        working-directory: /home/githubrunner/actions-runner/_work/example/example/test
+        
     steps:
-      - name: Print Step#1
-        run: echo "The job build is running......---.."
-      - name: Print PATH
-        run: echo $PATH
+    
+      - name: Present working directory
+        run: pwd
+        
+      - name: Check out this repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: test
+          
+      - name: Extract Branch Name
+        id: get-branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "branch_name=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "branch_name=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          fi
 
+      - name: Run branch and commit message checks
+        run: |
+          chmod +x /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg
+          export GIT_COMMIT_MSG_FILE=$(mktemp)
+          echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
+          export GIT_BRANCH_NAME="${{ steps.get-branch-name.outputs.branch_name }}"
+          echo "Branch name: $GIT_BRANCH_NAME"
+          /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
+          
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
-    needs: [validate-workflow-conditions, build]
+    needs: 
+      - validate-workflow-conditions
+      
     if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' || github.event_name == 'pull_request' && github.pull_request.base.ref == 'main') }}
     steps:
       - name: Print Step#1 in deploy-mcm-gke job

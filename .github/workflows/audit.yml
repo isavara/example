@@ -84,11 +84,22 @@ jobs:
           fetch-depth: 0
           path: test
           
+      - name: Extract Branch Name
+        id: get-branch-name
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "branch_name=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "branch_name=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run branch and commit message checks
         run: |
           chmod +x /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg
           export GIT_COMMIT_MSG_FILE=$(mktemp)
           echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
+          export GIT_BRANCH_NAME="${{ steps.get-branch-name.outputs.branch_name }}"
+          echo "Branch name: $GIT_BRANCH_NAME"
           /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
           
   update-mcm-gke:

@@ -63,7 +63,33 @@ jobs:
         run: echo "The job build is running......---.."
       - name: Print PATH
         run: echo $PATH
-
+        
+        
+  test:    
+    name: Job to run the tests
+    runs-on: gcp-public-runner-label-1
+    needs:
+      - validate-workflow-conditions
+      - build
+      # - fetch-changes
+    
+    steps:
+      - name: Present working directory
+        run: pwd
+        
+      - name: Check out this repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: test
+          
+      - name: Run branch and commit message checks
+        run: |
+          chmod +x /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg
+          export GIT_COMMIT_MSG_FILE=$(mktemp)
+          echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
+          /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
+          
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1

@@ -17,76 +17,54 @@ jobs:
       proceed: ${{ steps.check.outputs.proceed }}
     steps:
       - id: check
-        shell: bash
         run: |
-          # Define default values
+          # Determine event name
           EVENT_NAME="${{ github.event_name }}"
-          HEAD_REF=""
-          BASE_REF=""
-          PR_MERGED=""
+          PR_MERGED="false"
 
-          # Check for pull_request event to populate HEAD_REF, BASE_REF, and PR_MERGED
+          # Populate PR_MERGED if event is a pull_request
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            HEAD_REF="${{ github.head_ref }}"
-            BASE_REF="${{ github.base_ref }}"
-            PR_MERGED="${{ github.event.pull_request.merged }}"
+            PR_MERGED="${{ github.event.pull_request.merged || false }}"
           fi
 
-          # Log the variables to understand their values
-          echo "EVENT_NAME: $EVENT_NAME"
-          echo "HEAD_REF: $HEAD_REF"
-          echo "BASE_REF: $BASE_REF"
-          echo "PR_MERGED: $PR_MERGED"
+          # Log details
+          echo "EVENT_NAME=$EVENT_NAME"
+          echo "PR_MERGED=$PR_MERGED"
 
-          # Block pull requests targeting branches matching 'v*.*' (before merge)
-          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REF" == v*.* && "$PR_MERGED" == "false" ]]; then
-            echo "proceed=false" >> $GITHUB_OUTPUT
-          # For merges, check if the commit message contains version (v*.*)
-          elif [[ "$EVENT_NAME" == "push" && "$BASE_REF" == "main" && "$GITHUB_SHA" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+          # Determine whether to proceed
+          if [[ "$EVENT_NAME" == "pull_request" && "$PR_MERGED" == "false" ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
           else
             echo "proceed=true" >> $GITHUB_OUTPUT
           fi
 
-      # Print the result of the proceed variable for debugging
       - name: Print Proceed Value
         run: |
-          echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
+          echo "Proceed value is: $PROCEED"
+        env:
+          PROCEED: ${{ steps.check.outputs.proceed }}
 
-  # build:
-    # name: Perform golint and go-staticcheck
-    # runs-on: gcp-public-runner-label-1
-    # needs: validate-workflow-conditions
-    # if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
-    # steps:
-      # - name: Print Step#1
-        # run: echo "The job build is running......---.."
-      # - name: Print PATH
-        # run: echo $PATH
-        
-        
-  test:    
+
+  test:
     name: Job to run the tests
     runs-on: gcp-public-runner-label-1
     needs:
       - validate-workflow-conditions
-      # - build
-      # - fetch-changes
+    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
     defaults:
       run:
         working-directory: /home/githubrunner/actions-runner/_work/example/example/test
-        
+
     steps:
-    
       - name: Present working directory
         run: pwd
-        
+
       - name: Check out this repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           path: test
-          
+
       - name: Extract Branch Name
         id: get-branch-name
         run: |
@@ -104,15 +82,14 @@ jobs:
           export GIT_BRANCH_NAME="${{ steps.get-branch-name.outputs.branch_name }}"
           echo "Branch name: $GIT_BRANCH_NAME"
           /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
-          
+
   update-mcm-gke:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
-    needs: 
+    needs:
       - validate-workflow-conditions
-      
-    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' || github.event_name == 'pull_request' && github.pull_request.base.ref == 'main') }}
+    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
     steps:
       - name: Print Step#1 in deploy-mcm-gke job
         run: echo "The job update-mcm-gke is running..."

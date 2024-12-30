@@ -53,6 +53,7 @@ jobs:
         run: |
           echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
 
+
   build:
     name: Perform golint and go-staticcheck
     runs-on: gcp-public-runner-label-1

@@ -39,7 +39,11 @@ jobs:
           fi
 
       - name: Print Proceed Value
-        run: echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
+        run: |
+          echo "Proceed value is: $PROCEED"
+        env:
+          PROCEED: ${{ steps.check.outputs.proceed }}
+
 
   test:
     name: Job to run the tests

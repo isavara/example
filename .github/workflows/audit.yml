@@ -53,16 +53,16 @@ jobs:
         run: |
           echo "Proceed value is: ${{ steps.check.outputs.proceed }}"
 
-  build:
-    name: Perform golint and go-staticcheck
-    runs-on: gcp-public-runner-label-1
-    needs: validate-workflow-conditions
-    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
-    steps:
-      - name: Print Step#1
-        run: echo "The job build is running......---.."
-      - name: Print PATH
-        run: echo $PATH
+  # build:
+    # name: Perform golint and go-staticcheck
+    # runs-on: gcp-public-runner-label-1
+    # needs: validate-workflow-conditions
+    # if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
+    # steps:
+      # - name: Print Step#1
+        # run: echo "The job build is running......---.."
+      # - name: Print PATH
+        # run: echo $PATH
         
         
   test:    
@@ -70,11 +70,11 @@ jobs:
     runs-on: gcp-public-runner-label-1
     needs:
       - validate-workflow-conditions
-      - build
+      # - build
       # - fetch-changes
     defaults:
       run:
-        working-directory: /home/itadmin/bigfix-docker-rhel-runner-1/actions-runner/_work/bigfix-docker/bigfix-docker/test
+        working-directory: /home/githubrunner/actions-runner/_work/example/example/test
         
     steps:
     
@@ -109,7 +109,9 @@ jobs:
     name: Update MCM on GKE
     runs-on: gcp-public-runner-label-1
     environment: dev
-    needs: [validate-workflow-conditions, build]
+    needs: 
+      - validate-workflow-conditions
+      
     if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message != 'Merge pull request' || github.event_name == 'pull_request' && github.pull_request.base.ref == 'main') }}
     steps:
       - name: Print Step#1 in deploy-mcm-gke job

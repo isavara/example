@@ -21,20 +21,20 @@ jobs:
         run: |
           # Define default values
           EVENT_NAME="${{ github.event_name }}"
-          HEAD_REF="${{ github.head_ref }}"
-          BASE_REF="${{ github.base_ref }}"
-          PR_MERGED="${{ github.event.pull_request.merged || false }}"
+          PR_MERGED="false"
+
+          # Check for pull_request event to populate PR_MERGED
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            PR_MERGED="${{ github.event.pull_request.merged }}"
+          fi
 
           # Log the variables to understand their values
           echo "EVENT_NAME: $EVENT_NAME"
-          echo "HEAD_REF: $HEAD_REF"
-          echo "BASE_REF: $BASE_REF"
           echo "PR_MERGED: $PR_MERGED"
 
           # Skip checks for pull requests that are not yet merged
           if [[ "$EVENT_NAME" == "pull_request" && "$PR_MERGED" == "false" ]]; then
             echo "proceed=false" >> $GITHUB_OUTPUT
-          # For other cases, proceed with validations
           else
             echo "proceed=true" >> $GITHUB_OUTPUT
           fi
@@ -75,7 +75,7 @@ jobs:
         run: |
           chmod +x /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg
           export GIT_COMMIT_MSG_FILE=$(mktemp)
-          echo "${{ github.event.head_commit.message || '' }}" > $GIT_COMMIT_MSG_FILE
+          echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
           export GIT_BRANCH_NAME="${{ steps.get-branch-name.outputs.branch_name }}"
           echo "Branch name: $GIT_BRANCH_NAME"
           /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE

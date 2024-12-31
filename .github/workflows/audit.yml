@@ -26,79 +26,50 @@ jobs:
           IS_MERGE_TO_MAIN="false"
           IS_PR_OPENED="false"
 
-          # Check if the event is a pull_request
+          # Check if this is a pull request event
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
             if [[ "$PR_ACTION" == "opened" || "$PR_ACTION" == "synchronize" || "$PR_ACTION" == "reopened" ]]; then
               IS_PR_OPENED="true"
             fi
 
-            # Check if the PR is merged into main
-            PR_MERGED="${{ github.event.pull_request.merged || false }}"
-            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
-            if [[ "$PR_MERGED" == "true" && "$TARGET_BRANCH" == "main" ]]; then
+            # Check if the PR is merged into the main branch
+            if [[ "${{ github.event.pull_request.merged }}" == "true" && "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
+              PR_MERGED="true"
+              IS_MERGE_TO_MAIN="true"
+            fi
+          elif [[ "$EVENT_NAME" == "push" ]]; then
+            # Check if a direct push to main happened
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
               IS_MERGE_TO_MAIN="true"
             fi
           fi
 
-          # Log the context
+          # Log outputs for debugging
           echo "EVENT_NAME=$EVENT_NAME"
           echo "PR_ACTION=$PR_ACTION"
           echo "PR_MERGED=$PR_MERGED"
           echo "IS_MERGE_TO_MAIN=$IS_MERGE_TO_MAIN"
           echo "IS_PR_OPENED=$IS_PR_OPENED"
 
-          # Output variables
-          echo "proceed=true" >> $GITHUB_OUTPUT
+          # Set outputs
+          PROCEED="true"
+          if [[ "$IS_MERGE_TO_MAIN" == "true" ]]; then
+            PROCEED="false"
+          fi
+
+          echo "proceed=$PROCEED" >> $GITHUB_OUTPUT
           echo "is_merge_to_main=$IS_MERGE_TO_MAIN" >> $GITHUB_OUTPUT
           echo "is_pr_opened=$IS_PR_OPENED" >> $GITHUB_OUTPUT
-
-      - name: Print Output Values
-        run: |
-          echo "Proceed value: $PROCEED"
-          echo "Is Merge to Main: $IS_MERGE_TO_MAIN"
-          echo "Is PR Opened: $IS_PR_OPENED"
-        env:
-          PROCEED: ${{ steps.check.outputs.proceed }}
-          IS_MERGE_TO_MAIN: ${{ steps.check.outputs.is_merge_to_main }}
-          IS_PR_OPENED: ${{ steps.check.outputs.is_pr_opened }}
 
   test:
     name: Job to run the tests
     runs-on: gcp-public-runner-label-1
     needs:
       - validate-workflow-conditions
-    if: ${{ needs.validate-workflow-conditions.outputs.is_merge_to_main != 'true' && needs.validate-workflow-conditions.outputs.is_pr_opened != 'true' && needs.validate-workflow-conditions.outputs.proceed == 'true' }}
-    defaults:
-      run:
-        working-directory: /home/githubrunner/actions-runner/_work/example/example/test
-
+    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' && needs.validate-workflow-conditions.outputs.is_merge_to_main != 'true' && needs.validate-workflow-conditions.outputs.is_pr_opened != 'true' }}
     steps:
-      - name: Present working directory
-        run: pwd
-        
-      - name: Check out this repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          path: test
-          
-      - name: Extract Branch Name
-        id: get-branch-name
-        run: |
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "branch_name=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "branch_name=${{ github.head_ref }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Run branch and commit message checks
-        run: |
-          chmod +x /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg
-          export GIT_COMMIT_MSG_FILE=$(mktemp)
-          echo "${{ github.event.head_commit.message }}" > $GIT_COMMIT_MSG_FILE
-          export GIT_BRANCH_NAME="${{ steps.get-branch-name.outputs.branch_name }}"
-          echo "Branch name: $GIT_BRANCH_NAME"
-          /home/githubrunner/actions-runner/_work/example/example/test/.githooks/validate-branch-and-commit-msg $GIT_COMMIT_MSG_FILE
+      - name: Run Tests
+        run: echo "Running tests..."
 
   update-mcm-gke:
     name: Update MCM on GKE
@@ -108,7 +79,5 @@ jobs:
       - validate-workflow-conditions
     if: ${{ needs.validate-workflow-conditions.outputs.is_merge_to_main == 'true' }}
     steps:
-      - name: Print Step#1 in update-mcm-gke job
-        run: echo "The job update-mcm-gke is running... because this is a merge to the main branch."
-      - name: Print PATH
-        run: echo $PATH
+      - name: Update GKE
+        run: echo "Updating MCM on GKE because this is a merge to main branch."

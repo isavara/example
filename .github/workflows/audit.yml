@@ -8,11 +8,6 @@ on:
   pull_request:
     branches:
       - main
-      types:
-        - opened
-        - reopened
-        - synchronize
-        - closed
 
 jobs:
   validate-workflow-conditions:

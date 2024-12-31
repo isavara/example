@@ -15,42 +15,59 @@ jobs:
     runs-on: gcp-public-runner-label-1
     outputs:
       proceed: ${{ steps.check.outputs.proceed }}
+      is_merge_to_main: ${{ steps.check.outputs.is_merge_to_main }}
+      is_pr_opened: ${{ steps.check.outputs.is_pr_opened }}
     steps:
       - id: check
         run: |
-          # Determine event name
           EVENT_NAME="${{ github.event_name }}"
+          PR_ACTION="${{ github.event.action }}"
           PR_MERGED="false"
+          IS_MERGE_TO_MAIN="false"
+          IS_PR_OPENED="false"
 
-          # Populate PR_MERGED if event is a pull_request
+          # Check if the event is a pull_request
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            if [[ "$PR_ACTION" == "opened" || "$PR_ACTION" == "synchronize" || "$PR_ACTION" == "reopened" ]]; then
+              IS_PR_OPENED="true"
+            fi
+
+            # Check if the PR is merged into main
             PR_MERGED="${{ github.event.pull_request.merged || false }}"
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+            if [[ "$PR_MERGED" == "true" && "$TARGET_BRANCH" == "main" ]]; then
+              IS_MERGE_TO_MAIN="true"
+            fi
           fi
 
-          # Log details
+          # Log the context
           echo "EVENT_NAME=$EVENT_NAME"
+          echo "PR_ACTION=$PR_ACTION"
           echo "PR_MERGED=$PR_MERGED"
+          echo "IS_MERGE_TO_MAIN=$IS_MERGE_TO_MAIN"
+          echo "IS_PR_OPENED=$IS_PR_OPENED"
 
-          # Determine whether to proceed
-          if [[ "$EVENT_NAME" == "pull_request" && "$PR_MERGED" == "false" ]]; then
-            echo "proceed=false" >> $GITHUB_OUTPUT
-          else
-            echo "proceed=true" >> $GITHUB_OUTPUT
-          fi
+          # Output variables
+          echo "proceed=true" >> $GITHUB_OUTPUT
+          echo "is_merge_to_main=$IS_MERGE_TO_MAIN" >> $GITHUB_OUTPUT
+          echo "is_pr_opened=$IS_PR_OPENED" >> $GITHUB_OUTPUT
 
-      - name: Print Proceed Value
+      - name: Print Output Values
         run: |
-          echo "Proceed value is: $PROCEED"
+          echo "Proceed value: $PROCEED"
+          echo "Is Merge to Main: $IS_MERGE_TO_MAIN"
+          echo "Is PR Opened: $IS_PR_OPENED"
         env:
           PROCEED: ${{ steps.check.outputs.proceed }}
-
+          IS_MERGE_TO_MAIN: ${{ steps.check.outputs.is_merge_to_main }}
+          IS_PR_OPENED: ${{ steps.check.outputs.is_pr_opened }}
 
   test:
     name: Job to run the tests
     runs-on: gcp-public-runner-label-1
     needs:
       - validate-workflow-conditions
-    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
+    if: ${{ needs.validate-workflow-conditions.outputs.is_merge_to_main != 'true' && needs.validate-workflow-conditions.outputs.is_pr_opened != 'true' && needs.validate-workflow-conditions.outputs.proceed == 'true' }}
     defaults:
       run:
         working-directory: /home/githubrunner/actions-runner/_work/example/example/test
@@ -58,13 +75,13 @@ jobs:
     steps:
       - name: Present working directory
         run: pwd
-
+        
       - name: Check out this repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           path: test
-
+          
       - name: Extract Branch Name
         id: get-branch-name
         run: |
@@ -89,9 +106,9 @@ jobs:
     environment: dev
     needs:
       - validate-workflow-conditions
-    if: ${{ needs.validate-workflow-conditions.outputs.proceed == 'true' }}
+    if: ${{ needs.validate-workflow-conditions.outputs.is_merge_to_main == 'true' }}
     steps:
-      - name: Print Step#1 in deploy-mcm-gke job
-        run: echo "The job update-mcm-gke is running..."
+      - name: Print Step#1 in update-mcm-gke job
+        run: echo "The job update-mcm-gke is running... because this is a merge to the main branch."
       - name: Print PATH
         run: echo $PATH
